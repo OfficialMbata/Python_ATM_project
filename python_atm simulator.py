@@ -90,11 +90,10 @@ def deposit_function(name):
       accounts[name]['balance'] = accounts[name]['balance'] + deposit
 
       accounts[name]['history'].append(f'Amount deposited: ${deposit:,.2f}, New balance: ${accounts[name]['balance']:,.2f}')
-      return accounts[name]['balance'], True
+      return True
   
   except ValueError:
     print(f'Error: Invalid input!. Enter a valid number')
-    return False
 
 
 def withdraw_function(name):
@@ -117,7 +116,7 @@ def withdraw_function(name):
       accounts[name]['balance'] = accounts[name]['balance'] - withdraw
 
       accounts[name]['history'].append(f'Amount withdrawn: ${withdraw:,.2f}, New balance: ${accounts[name]['balance']:,.2f}')
-      return accounts[name]['balance'], True
+      return True
   except ValueError:
     print('Error: Invalid Input')
 
@@ -134,12 +133,25 @@ def transfer_function(name):
     
       transfer_amount = float(input("Enter the amount you wish to transfer: $"))
 
-      receiver_account['balance'] += transfer_amount
-      receiver_account['history'].append(f'CR: ${transfer_amount:,.2f}, New balance: ${receiver_account["balance"]:,.2f}')
+      if transfer_amount > accounts[name]['balance']:
+        print(f'Error: Insufficient funds!')
+        return False
 
-      accounts[name]['balance'] -= transfer_amount 
-      accounts[name]['history'].append(f'DR: ${transfer_amount:,.2f}, New balance: ${accounts[name]["balance"]:,.2f}')
-      return receiver_account, accounts[name]['balance'], True
+      elif transfer_amount <= 0:
+        print(f'Error: Invalid transfer amount')
+        return False
+
+      elif receiver_name == name:
+        print(f"Error: Unable transfer money to one's self")
+        return False
+
+      else:
+        receiver_account['balance'] += transfer_amount
+        receiver_account['history'].append(f'CR: ${transfer_amount:,.2f}, New balance: ${receiver_account["balance"]:,.2f}')
+
+        accounts[name]['balance'] -= transfer_amount 
+        accounts[name]['history'].append(f'DR: ${transfer_amount:,.2f}, New balance: ${accounts[name]["balance"]:,.2f}')
+        return True
 
     else:
       print(f'Error: Invalid username, Account not found')
@@ -240,7 +252,7 @@ def run_atm_simulator():
           time.sleep(2)
           break
 
-        elif user_input is not None:
+        elif user_choice is not None:
           lowest_value = min(services.keys())
           highest_value = max(services.keys())
           print(f'Invalid input! please select a number between {lowest_value} and {highest_value}')
